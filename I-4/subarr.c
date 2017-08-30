@@ -52,11 +52,38 @@ MaxSub FindMaximumSubArr(int *A, int low, int high) {
     }
 }
 
+// Brute force
+int SumArr(int *A, int low, int high) {
+    int sum = 0;
+    for (int i = low; i, i <= high; i++) {
+        sum += A[i];
+    }
+    return sum;
+}
+
+MaxSub FindMaximumSubArrBrute(int *A, int low, int high) {
+    MaxSub temp;
+    temp.sum = LOW;
+    for (int i = low; i < high; i++) {
+        for (int j = low + 1; j <= high; j++) {
+            int sum = SumArr(A, i, j);
+            if (sum > temp.sum) {
+                temp.sum = sum;
+                temp.left = i;
+                temp.right = j;
+            }
+        }
+    }
+    return temp;
+}
+
 int main() {
     int A[] = {13, -3, -25, 20, -3,  -16, -23, 18,
                20, -7, 12,  -5, -22, 15,  -4,  7};
     int size = sizeof(A) / sizeof(A[0]);
     MaxSub temp = FindMaximumSubArr(A, 0, size - 1);
+    MaxSub temp2 = FindMaximumSubArrBrute(A, 0, size - 1);
     printf("%d %d %d\n", temp.left, temp.right, temp.sum);
+    printf("%d %d %d\n", temp2.left, temp2.right, temp2.sum);
     return 0;
 }
