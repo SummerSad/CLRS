@@ -64,14 +64,26 @@ int SumArr(int *A, int low, int high) {
 MaxSub FindMaximumSubArrBrute(int *A, int low, int high) {
     MaxSub temp;
     temp.sum = LOW;
-    for (int i = low; i < high; i++) {
-        for (int j = low + 1; j <= high; j++) {
+    for (int i = low; i <= high; i++) {
+        for (int j = low; j <= high; j++) {
             int sum = SumArr(A, i, j);
             if (sum > temp.sum) {
                 temp.sum = sum;
                 temp.left = i;
                 temp.right = j;
             }
+        }
+    }
+    return temp;
+}
+
+// 4.1-5  nonrecursive linear-time
+
+MaxSub FindMaximumSubArrLinear(int *A, int low, int high) {
+    MaxSub temp;
+    for (int i = low; i <= high; i++) {
+        for (int j = low; j <= high; j++) {
+            int k = 0;
         }
     }
     return temp;
