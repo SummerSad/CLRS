@@ -30,6 +30,7 @@ void del_matrix(matrix *temp) {
 }
 
 void pri_matrix(matrix temp) {
+    printf("Matrix %dx%x\n", temp.row, temp.col);
     for (int i = 0; i < temp.row; i++) {
         for (int j = 0; j < temp.col; j++) {
             printf("%d ", temp.val[i][j]);
@@ -42,13 +43,30 @@ void pri_matrix(matrix temp) {
 matrix multi(matrix A, matrix B) {
     if (A.col == B.row) {
         matrix C = cre_matrix(A.row, B.col);
+        for (int i = 0; i < C.row; i++) {
+            for (int j = 0; j < C.col; j++) {
+                C.val[i][j] = 0;
+                for (int k = 0; k < A.col; k++) {
+                    C.val[i][j] += A.val[i][k] * B.val[k][j];
+                }
+            }
+        }
+        return C;
     }
 }
 
-int main() {
-    matrix A = cre_matrix(2, 3);
+void test(int i, int j, int k) {
+    matrix A = cre_matrix(i, j);
     rand_matrix(&A);
+    matrix B = cre_matrix(j, k);
+    rand_matrix(&B);
+    matrix C = multi(A, B);
     pri_matrix(A);
-    del_matrix(&A);
+    pri_matrix(B);
+    pri_matrix(C);
+}
+
+int main() {
+    test(2, 3, 4);
     return 0;
 }
