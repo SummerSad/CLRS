@@ -1,30 +1,10 @@
+#include "heapsort.h"
 #include "share.h"
 #include <stdlib.h>
 
-#define MYSIZE 10
-
-// Heap sort here I implement is max heap
-// max heap is arr[parent(i)] >= arr[i]
-void maxHeapify(int *arr, int size, int i);
-void buildMaxHeap(int *arr, int size);
-void maxHeapSort(int *arr, int size);
-
-int main()
-{
-    // rand a arr
-    int size = MYSIZE;
-    int *arr = (int *)malloc(sizeof(int) * size);
-    randArr(arr, size);
-
-    // test heap sort
-    maxHeapSort(arr, size);
-    printArr(arr, size);
-    free(arr);
-    return 0;
-}
-
 // check if arr[i] is violation heap or not
 // if yes, we need to make arr[i] right order in heap
+// *we have an assumption that arr[i+1..size-1] is already heap
 void maxHeapify(int *arr, int size, int i)
 {
     int left = i * 2 + 1;
@@ -43,25 +23,43 @@ void maxHeapify(int *arr, int size, int i)
     }
 }
 
-// build heap array
+// build heap array with above assumption
 void buildMaxHeap(int *arr, int size)
 {
     // run from n/2 to 0 because arr[n/2+1..n] are leaves
     // leaves are good in heap
     for (int i = (size - 1) / 2; i >= 0; --i)
     {
-        maxHeapify(arr, size, i);
+        // maxHeapify(arr, size, i);
+        maxHeapifyIterate(arr, size, i);
     }
 }
 
-// combine evrything to make heap sort
 void maxHeapSort(int *arr, int size)
 {
-    int i = size; // i: size->1
-    do
+    buildMaxHeap(arr, size);
+    int i = size;
+    while (i > 0)
     {
-        buildMaxHeap(arr, i);
         myswap(&arr[0], &arr[--i]); // make max move to the end
-        // and decrease heap size
-    } while (i > 0);
+        // maxHeapify(arr, i, 0);      // make arr[0] is max
+        maxHeapifyIterate(arr, i, 0);
+    }
+}
+
+// no recursive
+void maxHeapifyIterate(int *arr, int size, int i)
+{
+    int parent = i;
+    int child = parent * 2 + 1;
+    while (child < size)
+    {
+        if (child != size - 1) // have child and child+1
+            child = arr[child] > arr[child + 1] ? child : child + 1;
+        if (arr[parent] >= arr[child]) // already heap
+            break;
+        myswap(&arr[parent], &arr[child]);
+        parent = child;
+        child = parent * 2 + 1;
+    }
 }
