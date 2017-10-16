@@ -70,7 +70,7 @@ int HoareParitionMod(int *arr, int low, int high)
 }
 
 // Hoare original idea is not divide arr surround pivot,
-// He divie 2 subarr, the left is < the right
+// He divide 2 subarr, the left is < the right
 // But our idea is more: we have a pivot.
 // The left < pivot < the right
 int HoareParition(int *arr, int low, int high)
