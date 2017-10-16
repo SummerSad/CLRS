@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define RANDMAX 1000
+#define RANDMAX 50
 
 void myswap(int *a, int *b)
 {
