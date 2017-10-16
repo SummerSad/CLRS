@@ -2,6 +2,8 @@
 #include "share.h"
 #include <stdlib.h>
 
+// Make pivot in right location
+// low..pivot-1 < pivot < pivot+1..high
 int parition(int *arr, int low, int high)
 {
     int pivot = low;
@@ -26,6 +28,7 @@ void quickSort(int *arr, int low, int high, int (*howParition)(int *, int, int))
     if (low < high)
     {
         int pivot = howParition(arr, low, high);
+        // Because pivot is right place, we ignore it
         quickSort(arr, low, pivot - 1, howParition);
         quickSort(arr, pivot + 1, high, howParition);
     }
@@ -66,6 +69,10 @@ int HoareParitionMod(int *arr, int low, int high)
     }
 }
 
+// Hoare original idea is not divide arr surround pivot,
+// He divie 2 subarr, the left is < the right
+// But our idea is more: we have a pivot.
+// The left < pivot < the right
 int HoareParition(int *arr, int low, int high)
 {
     int x = arr[low];
@@ -76,11 +83,11 @@ int HoareParition(int *arr, int low, int high)
         do
         {
             --j;
-        } while (arr[j] > x); // stop when arr[j]<=x
+        } while (arr[j] > x); // Stop when arr[j]<=x
         do
         {
             ++i;
-        } while (arr[i] < x); // stop when arr[i]>=x
+        } while (arr[i] < x); // Stop when arr[i]>=x
         if (i < j)
         {
             myswap(&arr[i], &arr[j]);
@@ -97,6 +104,8 @@ void HoareQuickSort(int *arr, int low, int high)
     if (low < high)
     {
         int pivot = HoareParition(arr, low, high);
+        // Because we have 2 subarr, the left < the right
+        // We continue to recursive to 2 subarr
         HoareQuickSort(arr, low, pivot);
         HoareQuickSort(arr, pivot + 1, high);
     }
