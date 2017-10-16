@@ -38,7 +38,7 @@ int randParition(int *arr, int low, int high)
     return parition(arr, low, high);
 }
 
-int HoareParition(int *arr, int low, int high)
+int HoareParitionMod(int *arr, int low, int high)
 {
     int x = arr[low];
     int i = low;
@@ -63,5 +63,41 @@ int HoareParition(int *arr, int low, int high)
             myswap(&arr[low], &arr[j]);
             return j;
         }
+    }
+}
+
+int HoareParition(int *arr, int low, int high)
+{
+    int x = arr[low];
+    int i = low - 1;
+    int j = high + 1;
+    while (1)
+    {
+        do
+        {
+            --j;
+        } while (arr[j] > x); // stop when arr[j]<=x
+        do
+        {
+            ++i;
+        } while (arr[i] < x); // stop when arr[i]>=x
+        if (i < j)
+        {
+            myswap(&arr[i], &arr[j]);
+        }
+        else
+        {
+            return j;
+        }
+    }
+}
+
+void HoareQuickSort(int *arr, int low, int high)
+{
+    if (low < high)
+    {
+        int pivot = HoareParition(arr, low, high);
+        HoareQuickSort(arr, low, pivot);
+        HoareQuickSort(arr, pivot + 1, high);
     }
 }

@@ -11,7 +11,8 @@ int main()
     int *arr = (int *)malloc(sizeof(int) * size);
     randArr(arr, size);
     // printArr(arr, size);
-    quickSort(arr, 0, size - 1, HoareParition);
+    //quickSort(arr, 0, size - 1, HoareParitionMod);
+    HoareQuickSort(arr,0,size-1);
     // int d = HoareParition(arr, 0, size - 1);
     // printf("%d\n", d);
     // printArr(arr, size);
