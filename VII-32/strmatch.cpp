@@ -29,6 +29,7 @@ int naiveMatch(const char *T, const char *P)
 const int ALPHABET_NUM = 256;
 bool isSuffix(const char *P, int k, int q, char a)
 {
+    // P[0..k-1] is suffix P[0..q-1,a]
     if (k == 0)
         return true;
     if (P[k - 1] != a)
@@ -60,7 +61,7 @@ dfaTable::dfaTable(const char *P)
             do
             {
                 --k;
-            } while (!isSuffix(P, k, q, c));
+            } while (!isSuffix(P, k, q, c)); // end when Pk is suffix Pp'c'
             m_table[q][c] = k;
         }
     }
@@ -89,11 +90,11 @@ int dfaMatch(const char *T, const char *P)
     // create table for saving state
     dfaTable table(P);
 
-    int cur_state = 0;
+    int state = 0;
     for (int i = 0; i < n; ++i)
     {
-        cur_state = table[cur_state][(int)T[i]];
-        if (cur_state == m)
+        state = table[state][(int)T[i]];
+        if (state == m) // final state
         {
             return i - m + 1;
         }
