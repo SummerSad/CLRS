@@ -4,6 +4,9 @@ using namespace std;
 
 int main()
 {
-    cout << naiveMatch("abcbc", "bc");
+    char T[] = "abdcdababcd";
+    char P[] = "bcd";
+    cout << naiveMatch(T, P) << endl;
+    cout << dfaMatch(T, P) << endl;
     return 0;
 }
