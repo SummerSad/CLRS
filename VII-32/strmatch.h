@@ -19,7 +19,7 @@ public:
 };
 
 int naiveMatch(const char *T, const char *P);
-
 int dfaMatch(const char *T, const char *P);
+int kmpMatch(const char *T, const char *P);
 
 #endif
