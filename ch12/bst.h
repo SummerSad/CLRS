@@ -10,6 +10,8 @@ struct Node
     pNode parent;
 };
 
+void printPreOrder(pNode root, int indent);
+void delPostOder(pNode &root);
 pNode getNode(int k);
 
 // walk O(n)
@@ -29,8 +31,9 @@ pNode maximum(pNode root);
 pNode successor(pNode x);
 pNode predecessor(pNode x);
 
-// insertion and deletion
+// insertion O(h) and deletion
 void insertion(pNode &root, int k);
-void deletion(pNode &root);
+void deletion(pNode &root, int k);
+void transplant(pNode &root, pNode &u, pNode &v);
 
 #endif

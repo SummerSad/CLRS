@@ -3,6 +3,40 @@
 
 using namespace std;
 
+void printPreOrder(pNode root, int indent)
+{
+    if (root)
+    {
+        // print in preorder
+        for (int i = 0; i < indent; ++i)
+        {
+            cout << ' ';
+        }
+        cout << root->key << endl;
+
+        printPreOrder(root->left, indent + 4);
+        printPreOrder(root->right, indent + 4);
+    }
+    else
+    {
+        for (int i = 0; i < indent; ++i)
+        {
+            cout << ' ';
+        }
+        cout << "NULL" << endl;
+    }
+}
+
+void delPostOder(pNode &root)
+{
+    if (root)
+    {
+        delPostOder(root->left);
+        delPostOder(root->right);
+        delete root;
+    }
+}
+
 pNode getNode(int k)
 {
     pNode newNode = new Node;
@@ -150,7 +184,7 @@ void insertion(pNode &root, int k)
     {
         if (x->key == k)
         {
-            cout << "Key already exists" << endl;
+            cout << k << " already exist " << endl;
             return;
         }
         if (x->key < k)
@@ -169,12 +203,78 @@ void insertion(pNode &root, int k)
     {
         root = z;
     }
-    else if (!y->left)
+    else if (y->key > k)
     {
         y->left = z;
     }
-    else if (!y->right)
+    else
     {
         y->right = z;
     }
+}
+
+void transplant(pNode &root, pNode &u, pNode &v)
+{
+    // replace subtree at node u with subtree at node v
+    // u is root
+    if (!u->parent)
+    {
+        root = v;
+    }
+    // u is left child of parent(u)
+    else if (u == u->parent->left)
+    {
+        u->parent->left = v;
+    }
+    // u is right child
+    else if (u == u->parent->right)
+    {
+        u->parent->right = v;
+    }
+    // set parent(v) to match parent(u)
+    if (v)
+    {
+        v->parent = u->parent;
+    }
+}
+
+void deletion(pNode &root, int k)
+{
+    pNode z = searchIterative(root, k);
+    if (!z)
+    {
+        cout << "Don't exist so don't delete" << endl;
+        return;
+    }
+    if (!z->left)
+    {
+        transplant(root, z, z->right);
+    }
+    else if (!z->right)
+    {
+        transplant(root, z, z->left);
+    }
+    // z has 2 children
+    else
+    {
+        // y is successor(z), y has no left child
+        pNode y = minimum(z->right);
+        // if y is right child of z, only replace z by y
+        // if not, first replace y by y->right then
+        // replace z by y
+        if (y->parent != z)
+        {
+            // replace y by y->right
+            transplant(root, y, y->right);
+            // make y right child same as z right child
+            y->right = z->right;
+            y->right->parent = y;
+        }
+        // replace z by y
+        transplant(root, z, y);
+        // make y left child same as z left child
+        y->left = z->left;
+        y->left->parent = y;
+    }
+    delete z;
 }

@@ -13,4 +13,4 @@ tag:
 	$(TAG) .
 
 clean:
-	rm -f *.exe *.o *.out 
+	rm -f *.exe *.o *.out
