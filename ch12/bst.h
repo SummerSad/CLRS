@@ -35,5 +35,6 @@ pNode predecessor(pNode x);
 void insertion(pNode &root, int k);
 void deletion(pNode &root, int k);
 void transplant(pNode &root, pNode &u, pNode &v);
+void insertionRecursive(pNode &root, pNode parent, int k);
 
 #endif

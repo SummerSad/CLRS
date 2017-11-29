@@ -185,6 +185,7 @@ void insertion(pNode &root, int k)
         if (x->key == k)
         {
             cout << k << " already exist " << endl;
+            delete z;
             return;
         }
         if (x->key < k)
@@ -210,6 +211,44 @@ void insertion(pNode &root, int k)
     else
     {
         y->right = z;
+    }
+}
+
+void insertionRecursive(pNode &root, pNode parent, int k)
+{
+    if (!root)
+    {
+        pNode z = getNode(k);
+        root = z;
+        // Exception when root is real 'root'
+        // when that, parent is NULL
+        if (parent)
+        {
+            z->parent = parent;
+            if (parent->key > k)
+            {
+                parent->left = z;
+            }
+            else
+            {
+                parent->right = z;
+            }
+        }
+    }
+    else
+    {
+        if (root->key == k)
+        {
+            cout << k << " already exist" << endl;
+        }
+        else if (root->key < k)
+        {
+            insertionRecursive(root->right, root, k);
+        }
+        else
+        {
+            insertionRecursive(root->left, root, k);
+        }
     }
 }
 

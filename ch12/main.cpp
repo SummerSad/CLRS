@@ -8,23 +8,17 @@ using namespace std;
 int main()
 {
     pNode root = NULL;
-    insertion(root, 1);
-    insertion(root, 2);
-    insertion(root, -1);
-    insertion(root, 5);
-    insertion(root, -3);
-    insertion(root, 7);
-    insertion(root, 6);
-    insertion(root, 4);
+    insertionRecursive(root, NULL, 10);
+    insertionRecursive(root, NULL, 3);
+    insertionRecursive(root, NULL, 4);
+    insertionRecursive(root, NULL, 5);
+    insertionRecursive(root, NULL, 11);
+    insertionRecursive(root, NULL, 13);
+    insertionRecursive(root, NULL, 12);
+    insertionRecursive(root, NULL, 5);
     printPreOrder(root, 0);
 
-    deletion(root, 1);
-    printPreOrder(root, 0);
-
-    deletion(root, 5);
-    printPreOrder(root, 0);
-
-    deletion(root, 6);
+    deletion(root, 11);
     printPreOrder(root, 0);
 
     delPostOder(root);
