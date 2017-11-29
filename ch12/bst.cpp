@@ -174,7 +174,7 @@ pNode predecessor(pNode x)
 }
 
 // insertion and deletion
-void insertion(pNode &root, int k)
+void insertionRecursive(pNode &root, int k)
 {
     pNode z = getNode(k);
     pNode y = NULL;
@@ -277,7 +277,7 @@ void transplant(pNode &root, pNode &u, pNode &v)
     }
 }
 
-void deletion(pNode &root, int k)
+void deletionSuc(pNode &root, int k)
 {
     pNode z = searchIterative(root, k);
     if (!z)
@@ -314,6 +314,44 @@ void deletion(pNode &root, int k)
         // make y left child same as z left child
         y->left = z->left;
         y->left->parent = y;
+    }
+    delete z;
+}
+
+void deletionPre(pNode &root, int k)
+{
+    pNode z = searchIterative(root, k);
+    if (!z)
+    {
+        cout << "Don't exist so don't delete" << endl;
+        return;
+    }
+    if (!z->left)
+    {
+        transplant(root, z, z->right);
+    }
+    else if (!z->right)
+    {
+        transplant(root, z, z->left);
+    }
+    // z has 2 children
+    else
+    {
+        // y is predecessor(z), y has no right child
+        pNode y = maximum(z->left);
+        if (y->parent != z)
+        {
+            // replace y by y->left
+            transplant(root, y, y->left);
+            // because z->left != y change y->left to z->left
+            y->left = z->left;
+            y->left->parent = y;
+        }
+        // replace z by y
+        transplant(root, z, y);
+        // set y->right to same as z->right
+        y->right = z->right;
+        y->right->parent = z->right;
     }
     delete z;
 }

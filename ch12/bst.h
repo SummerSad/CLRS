@@ -32,9 +32,10 @@ pNode successor(pNode x);
 pNode predecessor(pNode x);
 
 // insertion O(h) and deletion
-void insertion(pNode &root, int k);
-void deletion(pNode &root, int k);
+void insertionIterative(pNode &root, int k);
+void deletionSuc(pNode &root, int k); // use successor
 void transplant(pNode &root, pNode &u, pNode &v);
 void insertionRecursive(pNode &root, pNode parent, int k);
+void deletionPre(pNode &root, int k); // use predecessor
 
 #endif
