@@ -121,7 +121,7 @@ pNode successor(pNode x)
     return y;
 }
 
-pNode predecessor(x)
+pNode predecessor(pNode x)
 {
     // predecessor(x) is the node with the largest key smaller than x
     if (x->left)
@@ -137,4 +137,44 @@ pNode predecessor(x)
         y = y->parent;
     }
     return y;
+}
+
+// insertion and deletion
+void insertion(pNode &root, int k)
+{
+    pNode z = getNode(k);
+    pNode y = NULL;
+    pNode x = root;
+    // Travese to where to insert
+    while (x)
+    {
+        if (x->key == k)
+        {
+            cout << "Key already exists" << endl;
+            return;
+        }
+        if (x->key < k)
+        {
+            y = x;
+            x = x->right;
+        }
+        else if (x->key > k)
+        {
+            y = x;
+            x = x->left;
+        }
+    }
+    z->parent = y;
+    if (!y) // tree is empty
+    {
+        root = z;
+    }
+    else if (!y->left)
+    {
+        y->left = z;
+    }
+    else if (!y->right)
+    {
+        y->right = z;
+    }
 }

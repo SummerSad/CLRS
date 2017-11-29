@@ -29,4 +29,8 @@ pNode maximum(pNode root);
 pNode successor(pNode x);
 pNode predecessor(pNode x);
 
+// insertion and deletion
+void insertion(pNode &root, int k);
+void deletion(pNode &root);
+
 #endif
