@@ -17,10 +17,17 @@ int main()
     rbInsert(T, 1);
     rbInsert(T, 2);
     rbInsert(T, 3);
-    printPreOrder(T.root, T.NIL, 0);
     rbInsert(T, 4);
     rbInsert(T, 5);
+    rbInsert(T, 6);
+    rbInsert(T, 7);
+    rbInsert(T, 8);
     printPreOrder(T.root, T.NIL, 0);
+
+    rbDelete(T, 2);
+    printPreOrder(T.root, T.NIL, 0);
+
     delPostOrder(T.root, T.NIL);
+    delete T.NIL;
     return 0;
 }

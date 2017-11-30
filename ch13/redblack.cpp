@@ -11,11 +11,6 @@ Tree::Tree()
     root = NIL;
 }
 
-Tree::~Tree()
-{
-    delete NIL;
-}
-
 pNode getNode(int k, Colors color, pNode NIL)
 {
     pNode newNode = new Node;
@@ -71,6 +66,23 @@ void delPostOrder(pNode &root, pNode NIL)
         delPostOrder(root->right, NIL);
         delete root;
     }
+}
+
+pNode search(Tree T, int k)
+{
+    pNode r = T.root;
+    while (r != T.NIL && r->key != k)
+    {
+        if (r->key > k)
+        {
+            r = r->left;
+        }
+        else
+        {
+            r = r->right;
+        }
+    }
+    return r;
 }
 
 // rotate
@@ -256,4 +268,211 @@ void rbInsertFixUp(Tree &T, pNode z)
         }
     }
     T.root->color = Black;
+}
+
+// min and max
+pNode minimum(pNode root, pNode NIL)
+{
+    // The most left
+    pNode r = root;
+    while (r != NIL && r->left != NIL)
+    {
+        r = r->left;
+    }
+    return r;
+}
+
+pNode maximum(pNode &root, pNode NIL)
+{
+    // The most right
+    pNode r = root;
+    while (r != NIL && r->right != NIL)
+    {
+        r = r->right;
+    }
+    return r;
+}
+
+// delete
+void rbTransplant(Tree &T, pNode u, pNode v)
+{
+    // Emptry tree
+    if (u->parent == T.NIL)
+    {
+        T.root = v;
+    }
+    // u is left child
+    if (u->parent->left == u)
+    {
+        u->parent->left = v;
+    }
+    // u is right child
+    else
+    {
+        u->parent->right = v;
+    }
+    v->parent = u->parent;
+}
+
+void rbDelete(Tree &T, int k)
+{
+    pNode z = search(T, k);
+    if (z == T.NIL)
+    {
+        cout << "Don't exist don't delete" << endl;
+        return;
+    }
+    // y need to be removed-z or to moved-successor(z)
+    pNode y = z;
+    Colors y_original_color = y->color;
+    // x keep track of y's original position
+    pNode x;
+    if (z->left == T.NIL)
+    {
+        x = z->right;
+        rbTransplant(T, z, z->right);
+    }
+    else if (z->right == T.NIL)
+    {
+        x = z->left;
+        rbTransplant(T, z, z->left);
+    }
+    // z has 2 children
+    else
+    {
+        // y is successor(z), y has no left child
+        y = minimum(z->right, T.NIL);
+        y_original_color = y->color;
+        x = y->right;
+        // if y is right child of z
+        if (y->parent == z)
+        {
+            // make sure x->parent point to y
+            // even if x is NIL
+            x->parent = y;
+        }
+        else
+        {
+            // replace y by y->right
+            rbTransplant(T, y, y->right);
+            // make sure z->right is right child of y
+            y->right = z->right;
+            y->right->parent = y;
+        }
+        // replace z by y
+        rbTransplant(T, z, y);
+        // make sure z->left is left child of y
+        y->left = z->left;
+        y->left->parent = y;
+        y->color = z->color;
+    }
+    delete z;
+    // if y original color is black, violate the height of black nodes
+    if (y_original_color == Black)
+    {
+        rbDeleteFixUp(T, x);
+    }
+}
+
+void rbDeleteFixUp(Tree &T, pNode x)
+{
+    // x is doubly-black
+    while (x != T.root && x->color == Black)
+    {
+        // x is left child
+        if (x->parent->left == x)
+        {
+            // w is sibling of x
+            // w can't be NIL because it violate height of black tree
+            // remember x is doubly-black
+            // if w is NIL, simple path to w less then simple path to x
+            pNode w = x->parent->right;
+            if (w->color == Red)
+            {
+                // Case 1
+                // make w Black and left rotate to convert to case 2,3,4
+                x->parent->color = Red;
+                w->color = Black;
+                leftRotate(T, x->parent);
+                w = x->parent->right; // reset sibling
+            }
+            if (w->left->color == Black && w->right->color == Black)
+            {
+                // Case 2
+                // Both children of w is Black
+                w->color = Red;
+                // move x
+                x = x->parent;
+            }
+            else
+            {
+                if (w->right->color == Black)
+                {
+                    // Case 3
+                    // right child of w is Black
+                    // right rotate then change color
+                    w->color = Red;
+                    w->left->color = Black;
+                    rightRotate(T, w);
+                    w = x->parent->right;
+                }
+                // Case 4
+                // right child of w is Red
+                w->color = x->parent->color;
+                x->parent->color = Black;
+                w->right->color = Black;
+                leftRotate(T, x->parent);
+                x = T.root;
+            }
+        }
+        // x is right child
+        else
+        {
+            // this is symmetric of above
+            // w is sibling of x
+            // w can't be NIL because it violate height of black tree
+            // remember x is doubly-black
+            // if w is NIL, simple path to w less then simple path to x
+            pNode w = x->parent->left;
+            if (w->color == Red)
+            {
+                // Case 1
+                // make w Black and right rotate to convert to case 2,3,4
+                x->parent->color = Red;
+                w->color = Black;
+                rightRotate(T, x->parent);
+                w = x->parent->left; // reset sibling
+            }
+            if (w->left->color == Black && w->right->color == Black)
+            {
+                // Case 2
+                // Both children of w is Black
+                w->color = Red;
+                // move x
+                x = x->parent;
+            }
+            else
+            {
+                if (w->left->color == Black)
+                {
+                    // Case 3
+                    // left child of w is Black
+                    // left rotate and change color
+                    w->color = Red;
+                    w->right->color = Black;
+                    leftRotate(T, w);
+                    w = x->parent->left;
+                }
+                // Case 4
+                // left child of w is Red
+                w->color = x->parent->color;
+                x->parent->color = Black;
+                w->left->color = Black;
+                rightRotate(T, x->parent);
+                x = T.root;
+            }
+        }
+    }
+    // x is red-and-black
+    x->color = Black;
 }
