@@ -13,5 +13,14 @@ using namespace std;
 
 int main()
 {
+    Tree T;
+    rbInsert(T, 1);
+    rbInsert(T, 2);
+    rbInsert(T, 3);
+    printPreOrder(T.root, T.NIL, 0);
+    rbInsert(T, 4);
+    rbInsert(T, 5);
+    printPreOrder(T.root, T.NIL, 0);
+    delPostOrder(T.root, T.NIL);
     return 0;
 }

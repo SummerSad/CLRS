@@ -2,7 +2,7 @@ GCC = g++
 MINGW_GCC = i686-w64-mingw32-g++
 CLANG = clang++
 CFLAGS = -Wall -Wextra -static
-SRCS = main.cpp 
+SRCS = main.cpp redblack.cpp
 TAG = ctags
 
 all:
@@ -10,3 +10,5 @@ all:
 
 tag:
 	$(TAG) .
+clean:
+	rm -f *.exe *.out *.o
