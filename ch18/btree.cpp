@@ -125,7 +125,7 @@ void B_Tree_Split_Child(pNode &father, int i)
     }
     old_son->n = T_MIN_DEGREE - 1;
     //// increase father's children and father's key
-    // move its childrean to the right
+    // move its children to the right
     father->children =
         (pNode *)realloc(father->children, sizeof(pNode) * (father->n + 2));
     for (int j = father->n + 1; j > i + 1; --j)
@@ -213,6 +213,7 @@ void B_Tree_Insert_NonFull(pNode &x, int k)
     }
 }
 
+// Final delete always occur in the leaf
 void B_Tree_Delete(pNode &root, int k)
 {
     if (root->leaf)
@@ -220,7 +221,7 @@ void B_Tree_Delete(pNode &root, int k)
         bool found = false;
         for (int i = 0; i < root->n; ++i)
         {
-            // found which key to be deleted
+            // found which key in leaf to be deleted
             if (root->key[i] == k)
             {
                 found = true;
@@ -228,7 +229,8 @@ void B_Tree_Delete(pNode &root, int k)
                 {
                     root->key[j] = root->key[j + 1];
                 }
-                root->key = (int *)realloc(root->key, root->n - 1);
+                root->key =
+                    (int *)realloc(root->key, sizeof(int) * (root->n - 1));
                 --root->n;
                 break;
             }
@@ -240,6 +242,55 @@ void B_Tree_Delete(pNode &root, int k)
     }
     else
     {
+        int i = 0;
+        while (i < root->n && root->key[i] < k)
+        {
+            ++i;
+        }
+        // found k in internal node
+        if (i < root->n && root->key[i] == k)
+        {
+            // key          i
+            // children    i i+1
+            if (root->children[i]->n >= T_MIN_DEGREE)
+            {
+                pNode predessor = maximum(root->children[i]);
+                root->key[i] = predessor->key[predessor->n];
+                B_Tree_Delete(predessor, root->key[i]);
+            }
+            else if (root->children[i + 1]->n >= T_MIN_DEGREE)
+            {
+                pNode successor = minimum(root->children[i + 1]);
+                root->key[i] = successor->key[0];
+                B_Tree_Delete(successor, root->key[i]);
+            }
+            // left and right of child ith only has t-1 keys (minimum)
+            // merge them
+            else
+            {
+            }
+        }
     }
     return;
+}
+
+pNode minimum(pNode root)
+{
+    pNode r = root;
+    while (!r->leaf)
+    {
+        r = r->children[0];
+    }
+    return r;
+}
+
+pNode maximum(pNode root)
+{
+    pNode r = root;
+    while (!r->leaf)
+    {
+        // r has r->n + 1 children
+        r = r->children[r->n];
+    }
+    return r;
 }

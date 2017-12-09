@@ -26,5 +26,7 @@ void B_Tree_Insert_NonFull(pNode &x, int k);
 
 // Delete
 void B_Tree_Delete(pNode &root, int k);
+pNode minimum(pNode root);
+pNode maximum(pNode root);
 
 #endif

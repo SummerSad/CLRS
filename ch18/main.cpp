@@ -20,7 +20,7 @@ int main()
     B_Tree_Print(root, 0);
 
     int i;
-    pNode found = B_Tree_Search(root, 24, i);
+    pNode found = B_Tree_Search(root, 12, i);
     if (found)
     {
         cout << found->key[i] << endl;
