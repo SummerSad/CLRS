@@ -265,9 +265,59 @@ void B_Tree_Delete(pNode &root, int k)
                 B_Tree_Delete(successor, root->key[i]);
             }
             // left and right of child ith only has t-1 keys (minimum)
-            // merge them
+            // merge them by delete right and make left contain k and right
+            // child
             else
             {
+                pNode i_left = root->children[i];
+                pNode i_right = root->children[i + 1];
+
+                // delete k from root
+                for (int j = i; j < root->n - 1; ++j)
+                {
+                    root->key[j] = root->key[j + 1];
+                    root->children[j + 1] = root->children[j + 2];
+                }
+                root->key =
+                    (int *)realloc(root->key, sizeof(int) * (root->n - 1));
+                root->children =
+                    (pNode *)realloc(root->children, sizeof(pNode) * (root->n));
+                --root->n;
+
+                // merge left and k and right
+                int new_size = i_left->n + i_right->n + 1;
+                i_left->key =
+                    (int *)realloc(i_left->key, sizeof(int) * new_size);
+                if (!i_left->leaf)
+                {
+                    i_left->children = (pNode *)realloc(
+                        i_left->children, sizeof(pNode) * (new_size + 1));
+                }
+                i_left->key[i_left->n] = k; // remember to add k
+                for (int j = 0; j < i_right->n; ++j)
+                {
+                    i_left->key[i_left->n + 1 + j] = i_right->key[j];
+                }
+                if (!i_left->leaf)
+                {
+                    for (int j = 0; j < i_right->n; ++j)
+                    {
+                        i_left->children[i_left->n + 1 + j] =
+                            i_right->children[j];
+                    }
+                    i_left->children[new_size] = i_right->children[i_right->n];
+                }
+                i_left->n = new_size;
+
+                // free right child memory
+                free(i_right->key);
+                if (!i_right->leaf)
+                {
+                    free(i_right->children);
+                }
+                delete i_right;
+
+                B_Tree_Delete(i_left, k);
             }
         }
     }

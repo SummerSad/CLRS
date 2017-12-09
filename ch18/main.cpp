@@ -19,17 +19,6 @@ int main()
     }
     B_Tree_Print(root, 0);
 
-    int i;
-    pNode found = B_Tree_Search(root, 12, i);
-    if (found)
-    {
-        cout << found->key[i] << endl;
-    }
-    else
-    {
-        cout << "Not found" << endl;
-    }
-
     B_Tree_DeAllocate(root);
     return 0;
 }
