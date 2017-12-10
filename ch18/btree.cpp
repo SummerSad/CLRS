@@ -6,7 +6,7 @@ using namespace std;
 // so key moi node co the chua:
 // it nhat: T_MIN_DEGREE-1
 // nhieu nhat 2*T_MIN_DEGREE-1
-const int T_MIN_DEGREE = 2;
+const int T_MIN_DEGREE = 3;
 
 void B_Tree_Print(pNode root, int indent)
 {
@@ -216,6 +216,7 @@ void B_Tree_Insert_NonFull(pNode &x, int k)
 // Final delete always occur in the leaf
 void B_Tree_Delete(pNode &root, int k)
 {
+    // case 1: k exist and root is leaf
     if (root->leaf)
     {
         bool found = false;
@@ -247,6 +248,7 @@ void B_Tree_Delete(pNode &root, int k)
         {
             ++i;
         }
+        // case 2 k exist but not leaf
         // found k in internal node
         if (i < root->n && root->key[i] == k)
         {
@@ -269,59 +271,82 @@ void B_Tree_Delete(pNode &root, int k)
             // child
             else
             {
-                pNode i_left = root->children[i];
-                pNode i_right = root->children[i + 1];
-
-                // delete k from root
-                for (int j = i; j < root->n - 1; ++j)
-                {
-                    root->key[j] = root->key[j + 1];
-                    root->children[j + 1] = root->children[j + 2];
-                }
-                root->key =
-                    (int *)realloc(root->key, sizeof(int) * (root->n - 1));
-                root->children =
-                    (pNode *)realloc(root->children, sizeof(pNode) * (root->n));
-                --root->n;
-
-                // merge left and k and right
-                int new_size = i_left->n + i_right->n + 1;
-                i_left->key =
-                    (int *)realloc(i_left->key, sizeof(int) * new_size);
-                if (!i_left->leaf)
-                {
-                    i_left->children = (pNode *)realloc(
-                        i_left->children, sizeof(pNode) * (new_size + 1));
-                }
-                i_left->key[i_left->n] = k; // remember to add k
-                for (int j = 0; j < i_right->n; ++j)
-                {
-                    i_left->key[i_left->n + 1 + j] = i_right->key[j];
-                }
-                if (!i_left->leaf)
-                {
-                    for (int j = 0; j < i_right->n; ++j)
-                    {
-                        i_left->children[i_left->n + 1 + j] =
-                            i_right->children[j];
-                    }
-                    i_left->children[new_size] = i_right->children[i_right->n];
-                }
-                i_left->n = new_size;
-
-                // free right child memory
-                free(i_right->key);
-                if (!i_right->leaf)
-                {
-                    free(i_right->children);
-                }
-                delete i_right;
-
-                B_Tree_Delete(i_left, k);
+                B_Tree_Merge_Child(root, i);
+                B_Tree_Delete(root->children[i], k);
             }
+        }
+        // case 3 k not exist but may exist in subtree in children ith
+        else
+        {
         }
     }
     return;
+}
+
+void B_Tree_Merge_Child(pNode &father, int i)
+{
+    // key       i
+    // children i i+1
+    pNode left_ch = father->children[i];
+    pNode right_ch = father->children[i + 1];
+
+    int k = father->key[i];
+    // delete k from father
+    for (int j = i; j < father->n - 1; ++j)
+    {
+        father->key[j] = father->key[j + 1];
+    }
+    father->key = (int *)realloc(father->key, sizeof(int) * (father->n - 1));
+    if (!father->leaf)
+    {
+        for (int j = i + 1; j < father->n; ++j)
+        {
+            father->children[j] = father->children[j + 1];
+        }
+        father->children =
+            (pNode *)realloc(father->children, sizeof(pNode) * (father->n));
+    }
+    --father->n;
+
+    // merge left and k and right
+    int new_size = left_ch->n + right_ch->n + 1;
+    left_ch->key = (int *)realloc(left_ch->key, sizeof(int) * new_size);
+    if (!left_ch->leaf)
+    {
+        left_ch->children =
+            (pNode *)realloc(left_ch->children, sizeof(pNode) * (new_size + 1));
+    }
+    left_ch->key[left_ch->n] = k; // remember to add k
+    for (int j = 0; j < right_ch->n; ++j)
+    {
+        left_ch->key[left_ch->n + 1 + j] = right_ch->key[j];
+    }
+    if (!left_ch->leaf)
+    {
+        for (int j = 0; j < right_ch->n; ++j)
+        {
+            left_ch->children[left_ch->n + 1 + j] = right_ch->children[j];
+        }
+        left_ch->children[new_size] = right_ch->children[right_ch->n];
+    }
+    left_ch->n = new_size;
+
+    // free right child memory
+    free(right_ch->key);
+    if (!right_ch->leaf)
+    {
+        free(right_ch->children);
+    }
+    delete right_ch;
+    // if father only have k, delete it
+    if (father->n == 0)
+    {
+        if (!father->leaf)
+        {
+            free(father->children);
+        }
+        delete father;
+    }
 }
 
 pNode minimum(pNode root)
