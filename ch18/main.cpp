@@ -19,7 +19,7 @@ int main()
     }
     B_Tree_Print(root, 0);
 
-    B_Tree_Delete(root, 0);
+    B_Tree_Delete(root, 24);
     B_Tree_Print(root, 0);
 
     B_Tree_DeAllocate(root);

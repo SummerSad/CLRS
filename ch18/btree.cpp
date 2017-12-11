@@ -219,13 +219,11 @@ void B_Tree_Delete(pNode &root, int k)
     // case 1: k exist and root is leaf
     if (root->leaf)
     {
-        bool found = false;
         for (int i = 0; i < root->n; ++i)
         {
             // found which key in leaf to be deleted
             if (root->key[i] == k)
             {
-                found = true;
                 for (int j = i; j < root->n - 1; ++j)
                 {
                     root->key[j] = root->key[j + 1];
@@ -233,54 +231,139 @@ void B_Tree_Delete(pNode &root, int k)
                 root->key =
                     (int *)realloc(root->key, sizeof(int) * (root->n - 1));
                 --root->n;
-                break;
+                return;
             }
         }
-        if (!found)
-        {
-            cout << k << " don't exist don't delete" << endl;
-        }
+        cout << k << " don't exist don't delete" << endl;
+        return;
     }
-    else
+    int i = 0;
+    while (i < root->n && root->key[i] < k)
     {
-        int i = 0;
-        while (i < root->n && root->key[i] < k)
+        ++i;
+    }
+    // case 2 k exist but not leaf
+    // found k in internal node
+    if (i < root->n && root->key[i] == k)
+    {
+        // key          i
+        // children    i i+1
+        if (root->children[i]->n >= T_MIN_DEGREE)
         {
-            ++i;
+            pNode predessor = maximum(root->children[i]);
+            root->key[i] = predessor->key[predessor->n];
+            B_Tree_Delete(predessor, root->key[i]);
         }
-        // case 2 k exist but not leaf
-        // found k in internal node
-        if (i < root->n && root->key[i] == k)
+        else if (root->children[i + 1]->n >= T_MIN_DEGREE)
         {
-            // key          i
-            // children    i i+1
-            if (root->children[i]->n >= T_MIN_DEGREE)
-            {
-                pNode predessor = maximum(root->children[i]);
-                root->key[i] = predessor->key[predessor->n];
-                B_Tree_Delete(predessor, root->key[i]);
-            }
-            else if (root->children[i + 1]->n >= T_MIN_DEGREE)
-            {
-                pNode successor = minimum(root->children[i + 1]);
-                root->key[i] = successor->key[0];
-                B_Tree_Delete(successor, root->key[i]);
-            }
-            // left and right of child ith only has t-1 keys (minimum)
-            // merge them by delete right and make left contain k and right
-            // child
-            else
-            {
-                B_Tree_Merge_Child(root, i);
-                B_Tree_Delete(root->children[i], k);
-            }
+            pNode successor = minimum(root->children[i + 1]);
+            root->key[i] = successor->key[0];
+            B_Tree_Delete(successor, root->key[i]);
         }
-        // case 3 k not exist but may exist in subtree in children ith
+        // left and right of child ith only has t-1 keys (minimum)
+        // merge them by delete right and make left contain k and right
+        // child
         else
         {
+            B_Tree_Merge_Child(root, i);
+            B_Tree_Delete(root->children[i], k);
         }
     }
-    return;
+    // case 3 k not exist but may exist in subtree in children ith
+    else
+    {
+        pNode child = root->children[i];
+        if (child->n == T_MIN_DEGREE - 1)
+        {
+            pNode left_sibling = i > 0 ? root->children[i - 1] : NULL;
+            pNode right_sibling = i < root->n ? root->children[i + 1] : NULL;
+            // one sibling has more than t
+            if (left_sibling && left_sibling->n >= T_MIN_DEGREE)
+            {
+                // move key[i-1] from root to most left of child, replace
+                // key[i-1] by most right key of right_sibling
+                child->key =
+                    (int *)realloc(child->key, sizeof(int) * (child->n + 1));
+                for (int j = child->n; j > 0; --j)
+                {
+                    child->key[j] = child->key[j - 1];
+                }
+                // move key[i-1] to child
+                child->key[0] =
+                    root->key[i - 1]; // i-1 because child has left sibling
+                if (!child->leaf)
+                {
+                    child->children = (pNode *)realloc(
+                        child->children, sizeof(pNode) * (child->n + 2));
+                    for (int j = child->n + 1; j > 0; --j)
+                    {
+                        child->children[j] = child->children[j - 1];
+                    }
+                    child->children[0] =
+                        left_sibling->children[left_sibling->n];
+                }
+                ++child->n;
+                // replace key[i-1]
+                root->key[i - 1] = left_sibling->key[left_sibling->n - 1];
+                // resize left_sibling
+                left_sibling->key = (int *)realloc(
+                    left_sibling, sizeof(int) * (left_sibling->n - 1));
+                if (!left_sibling->leaf)
+                {
+                    left_sibling->children = (pNode *)realloc(
+                        left_sibling, sizeof(pNode) * (left_sibling->n));
+                }
+                --left_sibling->n;
+            }
+            else if (right_sibling && right_sibling->n >= T_MIN_DEGREE)
+            {
+                // move key[i] from root to most right of child
+                // replace key[i] from root by most left of right_sibling
+                child->key =
+                    (int *)realloc(child->key, sizeof(int) * (child->n + 1));
+                child->key[child->n] = root->key[i];
+                if (!child->leaf)
+                {
+                    child->children = (pNode *)realloc(
+                        child->children, sizeof(pNode) * (child->n + 2));
+                    child->children[child->n + 1] = right_sibling->children[0];
+                }
+                ++child->n;
+                // replace key[i]
+                root->key[i] = right_sibling->key[0];
+                // resize right_sibling
+                for (int j = 0; j < right_sibling->n - 1; ++j)
+                {
+                    right_sibling->key[j] = right_sibling->key[j + 1];
+                }
+                right_sibling->key = (int *)realloc(
+                    right_sibling->key, sizeof(int) * (right_sibling->n - 1));
+                if (!right_sibling->leaf)
+                {
+                    for (int j = 0; j < right_sibling->n; ++j)
+                    {
+                        right_sibling->children[j] =
+                            right_sibling->children[j + 1];
+                    }
+                    right_sibling->children =
+                        (pNode *)realloc(right_sibling->children,
+                                         sizeof(pNode) * right_sibling->n);
+                }
+                --right_sibling->n;
+            }
+            // have siblings at limit t-1 size of key
+            else if (left_sibling)
+            {
+                B_Tree_Merge_Child(root, i - 1);
+                child = left_sibling;
+            }
+            else if (right_sibling)
+            {
+                B_Tree_Merge_Child(root, i);
+            }
+        }
+        B_Tree_Delete(child, k);
+    }
 }
 
 void B_Tree_Merge_Child(pNode &father, int i)
@@ -346,6 +429,7 @@ void B_Tree_Merge_Child(pNode &father, int i)
             free(father->children);
         }
         delete father;
+        father = left_ch;
     }
 }
 
