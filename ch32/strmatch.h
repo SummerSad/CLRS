@@ -3,23 +3,29 @@
 
 class dfaTable
 {
-private:
-    int **m_table;
-    int m_state;
-    int m_alphabet;
-    dfaTable();
-    dfaTable(const dfaTable &);
-    dfaTable &operator=(const dfaTable &);
+      private:
+	int **m_table;
+	int m_state;
+	int m_alphabet;
+	dfaTable();
+	dfaTable(const dfaTable &);
+	dfaTable &operator=(const dfaTable &);
 
-public:
-    dfaTable(const char *P);
-    ~dfaTable();
+      public:
+	dfaTable(const char *P);
+	~dfaTable();
 
-    int *operator[](int i);
+	int *operator[](int i);
 };
 
 int naiveMatch(const char *T, const char *P);
 int dfaMatch(const char *T, const char *P);
 int kmpMatch(const char *T, const char *P);
+int hpMatch(const char *T, const char *P);
+int rkMatch(const char *T, const char *P);
+
+// Gap character ?
+// Example a ? a can be aba, aca, ada,
+int naiveMatchGap(const char *T, const char *P);
 
 #endif
