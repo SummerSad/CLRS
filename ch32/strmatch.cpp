@@ -156,14 +156,17 @@ int hpMatch(const char *T, const char *P)
 	int n = strlen(T);
 	int m = strlen(P);
 
-	// Preprocess tao mang shift
+	// Create shift table
 	int *shift = new int[ALPHABET_NUM];
 	hpTable(P, shift);
 
+	// ABCDABAB
+	//  <-A
+	// ???A
 	int i = m - 1;
 	while (i < n) {
-		int k = 0;				  // reset moi lan duyet
-		while (k < m && P[m - 1 - k] == T[i - k]) // Duyet phai -> trai
+		int k = 0;
+		while (k < m && P[m - 1 - k] == T[i - k])
 			++k;
 		if (k == m) {
 			delete shift;
@@ -178,7 +181,6 @@ int hpMatch(const char *T, const char *P)
 	return -1;
 }
 
-// Gap
 const char GAP = '?';
 
 int naiveMatchGap(const char *T, const char *P)
@@ -192,5 +194,53 @@ int naiveMatchGap(const char *T, const char *P)
 		if (j == m)
 			return i;
 	}
+	return -1;
+}
+
+// Horspool with gap character
+void hpTableGap(const char *P, int *shift)
+{
+	int m = strlen(P);
+	for (int i = 0; i < ALPHABET_NUM; ++i) {
+		shift[i] = m;
+	}
+	int i;
+	for (i = m - 1; i >= 0 && P[i] != GAP; --i)
+		;
+	for (int j = 0; j < m - 1; ++j) {
+		if (P[j] != GAP) {
+			shift[(int)P[j]] = m - 1 - i;
+		}
+	}
+}
+
+int hpMatchGap(const char *T, const char *P)
+{
+	int n = strlen(T);
+	int m = strlen(P);
+
+	// Create shift table
+	int *shift = new int[ALPHABET_NUM];
+	hpTableGap(P, shift);
+
+	// ABCDABAB
+	//  <-A
+	// ???A
+	int i = m - 1;
+	while (i < n) {
+		int k = 0;
+		while (k < m &&
+		       (P[m - 1 - k] == T[i - k] || P[m - 1 - k] == GAP))
+			++k;
+		if (k == m) {
+			delete shift;
+			return i - m + 1;
+		}
+
+		// Dich con tro dang xet sang phai
+		// Hy vong T[i] tiep theo la end char cua P
+		i += shift[(int)T[i]];
+	}
+	delete shift;
 	return -1;
 }

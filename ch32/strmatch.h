@@ -27,5 +27,6 @@ int rkMatch(const char *T, const char *P);
 // Gap character ?
 // Example a ? a can be aba, aca, ada,
 int naiveMatchGap(const char *T, const char *P);
+int hpMatchGap(const char *T, const char *P);
 
 #endif
